@@ -1,0 +1,25 @@
+services:
+  plausible_db:
+    networks:
+      - plausible_network # replace with your internal network if needed
+  plausible_events_db:
+    networks:
+      - plausible_network # replace with your internal network if needed
+  plausible:
+    networks:
+      - plausible_network # replace with your internal network if needed
+      - traefik_network # replace with your external network exposed to Traefik
+    labels:
+      - traefik.enable=true
+      - traefik.docker.network=traefik_network # replace with your external network exposed to Traefik
+      - traefik.http.routers.plausible.rule=Host(`${DOMAIN}`)
+      - traefik.http.routers.plausible.entrypoints=websecure
+      - traefik.http.routers.plausible.tls.certresolver=letsencrypt
+      - traefik.http.services.plausible.loadbalancer.server.port=8000 # Port where the application is running
+networks:
+  plausible_network:
+    name: plausible_network # replace with your internal network if needed
+    driver: bridge
+    internal: true
+  traefik_network: # replace with your external network exposed to Traefik
+    external: true
