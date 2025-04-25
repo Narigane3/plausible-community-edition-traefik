@@ -12,9 +12,16 @@
 
 ---
 
+### Description
+
+This repository is forked from the [Plausible community-edition](https://github.com/plausible/community-edition)
+repository.
+It contains a getting started guide to self-hosting Plausible Community Edition with using Traefik as a reverse proxy.
+
 ### Prerequisites
 
 - **[Docker](https://docs.docker.com/engine/install/)** and **[Docker Compose](https://docs.docker.com/compose/install/)** must be installed on your machine.
+- **[Traefik](https://doc.traefik.io/traefik/)** must be installed and running on your docker host.
 - **CPU** must support **SSE 4.2** or **NEON** instruction set or higher (required by ClickHouse).
 - At least **2 GB of RAM** is recommended for running ClickHouse and Plausible without fear of OOMs.
 
@@ -39,44 +46,38 @@
     compose.yml
     ```
 
-1. Create and configure your [environment](https://docs.docker.com/compose/environment-variables/) file:
+2. Create and configure your [environment](https://docs.docker.com/compose/environment-variables/) file:
 
     ```console
     $ touch .env
     $ echo "BASE_URL=https://plausible.example.com" >> .env
     $ echo "SECRET_KEY_BASE=$(openssl rand -base64 48)" >> .env
-    
+    $ echo "DOMAIN=plausible.example.com" >> .env
+   
     $ cat .env
     BASE_URL=https://plausible.example.com
     SECRET_KEY_BASE=As0fZsJlUpuFYSthRjT5Yflg/NlxkFKPRro72xMLXF8yInZ60s6xGGXYVqml+XN1
     ```
 
-    Make sure `$BASE_URL` is set to the actual domain where you plan to host the service. The domain must have a DNS entry pointing to your server for proper resolution and automatic Let's Encrypt TLS certificate issuance. More on that in the next step.
+   Make sure `$BASE_URL` is set to the actual domain where you plan to host the service. The domain must have a DNS
+   entry pointing to your server for proper resolution and automatic Let's Encrypt TLS certificate issuance. More on
+   that in the next step.
 
-1. Expose Plausible server to the web with a [compose override file:](https://github.com/plausible/community-edition/wiki/compose-override)
+3. Expose Plausible server to the web with
+   a [compose override file:](https://github.com/plausible/community-edition/wiki/compose-override)
 
     ```sh
-    $ echo "HTTP_PORT=80" >> .env
-    $ echo "HTTPS_PORT=443" >> .env
+    $ echo "HTTP_PORT=8000" >> .env
+   ```
+4. On compose override file, change the traefik_network to the network you are using.
 
-    $ cat > compose.override.yml << EOF
-    services:
-      plausible:
-        ports:
-          - 80:80
-          - 443:443
-    EOF 
-    ```
-
-    Setting `HTTP_PORT=80` and `HTTPS_PORT=443` enables automatic Let's Encrypt TLS certificate issuance. You might want to choose different values if, for example, you plan to run Plausible behind [a reverse proxy.](https://github.com/plausible/community-edition/wiki/reverse-proxy)
-
-1. Start the services with Docker Compose:
+5. Start the services with Docker Compose:
 
     ```console
     $ docker compose up -d
     ```
 
-1. Visit your instance at `$BASE_URL` and create the first user.
+6. Visit your instance at `$BASE_URL` and create the first user.
 
 > [!NOTE]
 > Plausible CE is funded by our cloud subscribers.

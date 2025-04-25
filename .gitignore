@@ -1,4 +1,5 @@
 *
+!compose.override.yml
 !compose.yml
 !clickhouse/logs.xml
 !clickhouse/ipv4-only.xml
